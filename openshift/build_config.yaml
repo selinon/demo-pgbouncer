@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: pgbouncer-buildconfig
+  selinon: 1.0.0
+metadata:
+  name: pgbouncer-buildconfig
+  annotations:
+    description: 
+    openshift.io/display-name: 'Selinon: pgbouncer'
+    version: 1.0.0
+    tags: poc,selinon,pgbouncer,postgres
+    template.openshift.io/documentation-url: https://github.com/selinon/
+    template.openshift.io/long-description: Selinon pgbouncer buildconfig template.
+    template.openshift.io/provider-display-name: Fridolin Pokorny
+
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: pgbouncer
+    labels:
+      app: selinon-storages
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "pgbouncer:${IMAGE_STREAM_TAG}"
+    source:
+      type: Git
+      git:
+        uri: ${GITHUB_URL}
+        ref: ${GITHUB_REF}
+    strategy:
+      type: dockerStrategy
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: centos:7
+    triggers:
+    - type: ImageChange
+      imageChange: {}
+
+parameters:
+- description: Name of the github repository for Selinon pgbouncer
+  displayName: Git Repository
+  required: true
+  name: GITHUB_URL
+  value: 'https://github.com/selinon/demo-pgbouncer'
+
+- description: Git reference to be used for Selinon pgbouncer
+  displayName: Git Reference
+  required: true
+  name: GITHUB_REF
+  value: 'master'
+
+- description: Tag of the output ImageStream the resulting container image should go to
+  displayName: ImageStream Tag
+  required: true
+  name: IMAGE_STREAM_TAG
+  value: 'latest'

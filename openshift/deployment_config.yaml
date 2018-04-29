@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: pgbouncer-deploymentconfig
+  thoth: 1.0.0
+metadata:
+  name: pgbouncer-deploymentconfig
+  annotations:
+    description: Selinon pgbouncer
+    openshift.io/display-name: 'Selinon: pgbouncer'
+    version: 1.0.0
+    tags: poc,selinon,pgbouncer,postgres
+    template.openshift.io/documentation-url: https://github.com/selinon/
+    template.openshift.io/long-description: Selinon pgbouncer deployment configuration template.
+    template.openshift.io/provider-display-name: Fridolin Pokorny
+
+objects:
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    labels:
+      service: pgbouncer
+      app: selinon
+      component: pgbouncer
+    name: pgbouncer
+  spec:
+    ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      service: pgbouncer
+
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      service: pgbouncer
+      app: selinon
+      component: pgbouncer
+    name: pgbouncer
+  spec:
+    replicas: 1
+    selector:
+      service: pgbouncer
+    template:
+      metadata:
+        labels:
+          service: pgbouncer
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_USER
+            value: user
+          - name: POSTGRESQL_PASSWORD
+            value: postgres
+          - name: POSTGRESQL_DATABASE
+            value: selinon
+          name: pgbouncer
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            timeoutSeconds: 10
+    test: false
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - pgbouncer
+        from:
+          kind: ImageStreamTag
+          name: 'pgbouncer:latest'
