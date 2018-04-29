@@ -21,7 +21,7 @@ objects:
   metadata:
     labels:
       service: pgbouncer
-      app: selinon
+      app: selinon-storages
       component: pgbouncer
     name: pgbouncer
   spec:
@@ -38,7 +38,7 @@ objects:
   metadata:
     labels:
       service: pgbouncer
-      app: selinon
+      app: selinon-storages
       component: pgbouncer
     name: pgbouncer
   spec:

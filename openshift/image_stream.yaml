@@ -19,7 +19,7 @@ objects:
   apiVersion: v1
   metadata:
     labels:
-      app: selinon
+      app: selinon-storages
     name: pgbouncer
   spec:
     name: latest
