@@ -53,11 +53,20 @@ objects:
         containers:
         - env:
           - name: POSTGRESQL_USER
-            value: user
+            valueFrom:
+              configMapKeyRef:
+                name: selinon
+                key: postgres-user
           - name: POSTGRESQL_PASSWORD
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                name: selinon
+                key: postgres-password
           - name: POSTGRESQL_DATABASE
-            value: selinon
+            valueFrom:
+              configMapKeyRef:
+                name: selinon
+                key: postgres-database
           name: pgbouncer
           ports:
             - containerPort: 5432
